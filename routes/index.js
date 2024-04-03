@@ -1,4 +1,4 @@
-const auth = require('./auth');
+const { requireAuth, requireAdmin } = require('./auth');
 const users = require('./users');
 const products = require('./products');
 const orders = require('./orders');
@@ -10,7 +10,7 @@ const root = (app, next) => {
   return next();
 };
 
-// eslint-disable-next-line consistent-return
+// Função para registrar os middlewares e rotas
 const register = (app, routes, cb) => {
   if (!routes.length) {
     return cb();
@@ -24,10 +24,12 @@ const register = (app, routes, cb) => {
   });
 };
 
+// Exporta o módulo que registra as rotas e middlewares
 module.exports = (app, next) => register(app, [
-  auth,
-  users,
-  products,
-  orders,
-  root,
+  requireAuth, // Middleware para autenticação
+  requireAdmin, // Middleware para exigir autenticação de administrador
+  users, // Rotas relacionadas aos usuários
+  products, // Rotas relacionadas aos produtos
+  orders, // Rotas relacionadas aos pedidos
+  root, // Rota raiz
 ], next);

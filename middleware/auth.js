@@ -18,31 +18,29 @@ module.exports = (secret) => (req, resp, next) => {
       return next(403);
     }
 
-    // TODO: Verify user identity using `decodeToken.uid`
+    req.user = decodedToken;
+    next();
   });
 };
 
-module.exports.isAuthenticated = (req) => (
-  // TODO: Decide based on the request information whether the user is authenticated
-  false
-);
 
-module.exports.isAdmin = (req) => (
-  // TODO: Decide based on the request information whether the user is an admin
-  false
-);
+module.exports.isAuthenticated = (req) => !!req.user;
 
-module.exports.requireAuth = (req, resp, next) => (
-  (!module.exports.isAuthenticated(req))
-    ? next(401)
-    : next()
-);
+module.exports.isAdmin = (req) => req.user && req.user.role === 'admin';
 
-module.exports.requireAdmin = (req, resp, next) => (
-  // eslint-disable-next-line no-nested-ternary
-  (!module.exports.isAuthenticated(req))
-    ? next(401)
-    : (!module.exports.isAdmin(req))
-      ? next(403)
-      : next()
-);
+module.exports.requireAuth = (req, resp, next) => {
+  if (!module.exports.isAuthenticated(req)) {
+    return next(401);
+  }
+  next();
+};
+
+module.exports.requireAdmin = (req, resp, next) => {
+  if (!module.exports.isAuthenticated(req)) {
+    return next(401);
+  }
+  if (!module.exports.isAdmin(req)) {
+    return next(403);
+  }
+  next();
+};
