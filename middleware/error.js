@@ -21,6 +21,13 @@ module.exports = (err, req, resp, next) => {
     console.error(statusCode, message);
   }
 
-  resp.status(statusCode).json({ statusCode, message });
-  next();
+  if (resp.headersSent) {
+    return next(err);
+  }
+
+  console.error(err);
+  resp.status(statusCode).json({
+    statusCode,
+    message: message || 'Internal Server Error',
+  });
 };

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -18,6 +19,16 @@ const userSchema = new mongoose.Schema({
     default: 'user'
   }
 });
+
+// Método para comparar a senha fornecida com a senha armazenada no banco de dados
+userSchema.methods.comparePassword = async function(clientPassword) {
+  try {
+    return await bcrypt.compare(clientPassword, this.password);
+  } catch (error) {
+    console.error('Senha incorreta:', error);
+    return false;
+  }
+};
 
 const User = mongoose.model('User', userSchema);
 
