@@ -1,22 +1,11 @@
-const {
-  requireAuth,
-} = require('../middleware/auth');
+const express = require('express');
+const router = express.Router();
+const orderController = require('../controller/orders');
 
-module.exports = (app, nextMain) => {
-  app.get('/orders', requireAuth, (req, resp, next) => {
-  });
+router.get('/orders', orderController.getAllOrders);
+router.get('/orders/:orderId', orderController.getOrderById);
+router.post('/orders', orderController.createOrder);
+router.put('/orders/:orderId', orderController.updateOrder);
+router.delete('/orders/:orderId', orderController.deleteOrder);
 
-  app.get('/orders/:orderId', requireAuth, (req, resp, next) => {
-  });
-
-  app.post('/orders', requireAuth, (req, resp, next) => {
-  });
-
-  app.put('/orders/:orderId', requireAuth, (req, resp, next) => {
-  });
-
-  app.delete('/orders/:orderId', requireAuth, (req, resp, next) => {
-  });
-
-  nextMain();
-};
+module.exports = router;
