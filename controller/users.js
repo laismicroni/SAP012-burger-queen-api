@@ -1,34 +1,19 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 // Função para listar todos os usuários
-const getUsers = async (req, res, next) => {
+const getUsers = async () => {
   try {
     const users = await User.find({}).select('-password');
-    res.status(200).json(users);
+    return users;
   } catch (error) {
     console.error('Erro ao buscar usuários:', error.message);
-    res.status(500).json({ error: 'Erro ao buscar usuários' });
+    throw new Error('Erro ao buscar usuários');
   }
 };
 
-// Função para obter informações de um usuário pelo ID
-const getUserById = async (req, res, next) => {
-  const { uid } = req.params;
-  try {
-    const user = await User.findById(uid).select('-password');
-    if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    console.error('Erro ao buscar usuário:', error.message);
-    res.status(500).json({ error: 'Erro ao buscar usuário' });
-  }
-};
-
-// Função para criar um novo usuário
-const createUser = async (req, res, next) => {
+const createUser = async (req, res) => {
   try {
     const { email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -40,50 +25,60 @@ const createUser = async (req, res, next) => {
     await user.save();
     // Remova a senha do usuário antes de enviar a resposta
     user.password = undefined;
-    res.status(201).json(user);
+    return user; // Retorna o usuário criado
   } catch (error) {
     console.error('Erro ao criar usuário:', error.message);
     res.status(500).json({ error: 'Erro ao criar usuário' });
   }
 };
 
+
 // Função para modificar um usuário pelo ID
-const updateUser = async (req, res, next) => {
-  const { uid } = req.params;
+const updateUser = async (uid, data) => {
   try {
-    const user = await User.findByIdAndUpdate(uid, req.body, { new: true }).select('-password');
+    const user = await User.findByIdAndUpdate(uid, data, { new: true }).select('-password');
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      throw new Error('Usuário não encontrado');
     }
-    res.status(200).json(user);
+    return user;
   } catch (error) {
     console.error('Erro ao atualizar usuário:', error.message);
-    res.status(500).json({ error: 'Erro ao atualizar usuário' });
+    throw error;
+  }
+};
+
+// Função para buscar um usuário pelo ID ou e-mail
+const getUser = async (identifier) => {
+  try {
+    let user;
+
+    // Verificar se o identificador é um ID MongoDB válido
+    if (mongoose.Types.ObjectId.isValid(identifier)) {
+      user = await User.findById(identifier).select('-password');
+    } else {
+      const normalizedEmail = identifier.trim().toLowerCase();
+      user = await User.findOne({ email: normalizedEmail }).select('-password');
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error.message);
+    throw new Error(`Erro ao buscar usuário: ${error.message}`);
   }
 };
 
 // Função para deletar um usuário pelo ID
-const deleteUser = async (req, res, next) => {
-  const { uid } = req.params;
+const deleteUser = async (uid) => {
   try {
     const user = await User.findByIdAndDelete(uid).select('-password');
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' });
+      throw new Error('Usuário não encontrado');
     }
-    res.status(200).json(user);
-  } catch (error) {
-    console.error('Erro ao deletar usuário:', error.message);
-    res.status(500).json({ error: 'Erro ao deletar usuário' });
-  }
-};
-
-const getUserByEmail = async (email) => {
-  try {
-    const user = await User.findOne({ email });
     return user;
   } catch (error) {
-    throw new Error(`Erro ao buscar usuário pelo e-mail: ${error.message}`);
+    console.error('Erro ao deletar usuário:', error.message);
+    throw error;
   }
 };
 
-module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser, getUserByEmail };
+module.exports = { getUsers, getUser, createUser, updateUser, deleteUser };
