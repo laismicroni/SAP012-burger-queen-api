@@ -1,24 +1,11 @@
-const {
-  requireAuth,
-  requireAdmin,
-} = require('../middleware/auth');
+const express = require('express');
+const router = express.Router();
+const productController = require('../controller/products');
 
-module.exports = (app, nextMain) => {
+router.get('/products', productController.getAllProducts);
+router.get('/products/:productId', productController.getProductById);
+router.post('/products', productController.createProduct);
+router.put('/products/:productId', productController.updateProduct);
+router.delete('/products/:productId', productController.deleteProduct);
 
-  app.get('/products', requireAuth, (req, resp, next) => {
-  });
-
-  app.get('/products/:productId', requireAuth, (req, resp, next) => {
-  });
-
-  app.post('/products', requireAdmin, (req, resp, next) => {
-  });
-
-  app.put('/products/:productId', requireAdmin, (req, resp, next) => {
-  });
-
-  app.delete('/products/:productId', requireAdmin, (req, resp, next) => {
-  });
-
-  nextMain();
-};
+module.exports = router;
