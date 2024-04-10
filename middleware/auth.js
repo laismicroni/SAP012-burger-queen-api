@@ -18,21 +18,17 @@ module.exports = (secret) => (req, resp, next) => {
     if (err) {
       return next(403);
     }
-
-    // Verify user identity using `decodedToken.userId`
-    // Here you can fetch user data from the database if needed
+    
     req.userId = decodedToken.userId;
     next();
   });
 };
 
 module.exports.isAuthenticated = (req) => (
-  // Decide based on the request information whether the user is authenticated
   !!req.userId
 );
 
 module.exports.isAdmin = async (req) => {
-  // Aqui você precisa buscar as informações do usuário com base no ID fornecido pelo token
   const user = await User.findById(req.userId);
   
   // Verifique se o usuário existe e se tem permissão de administrador
