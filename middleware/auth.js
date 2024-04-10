@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 module.exports = (secret) => (req, resp, next) => {
   const { authorization } = req.headers;
@@ -18,31 +19,36 @@ module.exports = (secret) => (req, resp, next) => {
       return next(403);
     }
 
-    // TODO: Verify user identity using `decodeToken.uid`
+    // Verify user identity using `decodedToken.userId`
+    // Here you can fetch user data from the database if needed
+    req.userId = decodedToken.userId;
+    next();
   });
 };
 
 module.exports.isAuthenticated = (req) => (
-  // TODO: Decide based on the request information whether the user is authenticated
-  false
+  // Decide based on the request information whether the user is authenticated
+  !!req.userId
 );
 
-module.exports.isAdmin = (req) => (
-  // TODO: Decide based on the request information whether the user is an admin
-  false
-);
+module.exports.isAdmin = async (req) => {
+  // Aqui você precisa buscar as informações do usuário com base no ID fornecido pelo token
+  const user = await User.findById(req.userId);
+  
+  // Verifique se o usuário existe e se tem permissão de administrador
+  return user && user.role === 'admin';
+};
 
 module.exports.requireAuth = (req, resp, next) => (
-  (!module.exports.isAuthenticated(req))
+  !module.exports.isAuthenticated(req)
     ? next(401)
     : next()
 );
 
 module.exports.requireAdmin = (req, resp, next) => (
-  // eslint-disable-next-line no-nested-ternary
-  (!module.exports.isAuthenticated(req))
+  !module.exports.isAuthenticated(req)
     ? next(401)
-    : (!module.exports.isAdmin(req))
+    : !module.exports.isAdmin(req)
       ? next(403)
       : next()
 );

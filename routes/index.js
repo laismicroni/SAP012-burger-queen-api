@@ -1,33 +1,33 @@
-const auth = require('./auth');
-const users = require('./users');
-const products = require('./products');
-const orders = require('./orders');
+const express = require('express');
+const authRoutes = require('./auth');
+const usersRoutes = require('./users');
+const productsRoutes = require('./products');
+const ordersRoutes = require('./orders');
 
-const root = (app, next) => {
-  const pkg = app.get('pkg');
-  app.get('/', (req, res) => res.json({ name: pkg.name, version: pkg.version }));
-  app.all('*', (req, resp, nextAll) => nextAll(404));
+const root = (router, next) => {
+  const pkg = router.get('pkg');
+  router.get('/', (req, res) => res.json({ name: pkg.name, version: pkg.version }));
+  router.all('*', (req, res, nextAll) => nextAll(404));
   return next();
 };
 
-// eslint-disable-next-line consistent-return
-const register = (app, routes, cb) => {
+const registerRoutes = (router, routes, next) => {
   if (!routes.length) {
-    return cb();
+    return next();
   }
 
-  routes[0](app, (err) => {
-    if (err) {
-      return cb(err);
-    }
-    return register(app, routes.slice(1), cb);
-  });
+  const currentRoute = routes[0];
+  router.use(currentRoute);
+  
+  return registerRoutes(router, routes.slice(1), next);
 };
 
-module.exports = (app, next) => register(app, [
-  auth,
-  users,
-  products,
-  orders,
-  root,
-], next);
+module.exports = (app, next) => {
+  const router = express.Router();
+  
+  const routes = [authRoutes, usersRoutes, productsRoutes, ordersRoutes];
+
+  registerRoutes(router, routes, next);
+
+  app.use(router);
+};
