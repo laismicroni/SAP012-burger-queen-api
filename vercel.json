@@ -1,0 +1,18 @@
+{
+    "version": "2",
+    "builds": [
+      {
+        "sourceDirectory": "./",
+        "command": "docker build -t vercel .",
+        "env": {
+          "NODE_ENV": "production"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/",
+        "dest": "/api"
+      }
+    ]
+  }
