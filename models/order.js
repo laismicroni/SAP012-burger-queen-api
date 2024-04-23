@@ -16,31 +16,9 @@ const orderSchema = new mongoose.Schema({
       required: true,
     },
     product: {
-      type: {
-        id: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      price: {
-        type: Number,
-        required: true,
-      },
-      image: {
-        type: String,
-        required: true,
-      },
-      type: {
-        type: String,
-        required: true,
-      },
-      dateEntry: {
-        type: Date,
-        default: Date.now,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
     },
   }],
   status: {
@@ -55,6 +33,10 @@ const orderSchema = new mongoose.Schema({
   dateProcessed: {
     type: Date,
   },
+});
+
+orderSchema.pre('save', (next) => {
+  next();
 });
 
 const Order = mongoose.model('Order', orderSchema);

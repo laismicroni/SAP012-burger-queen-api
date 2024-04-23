@@ -96,7 +96,7 @@ const waitForServerToBeReady = (retries = 10) => new Promise((resolve, reject) =
     fetch('/')
       .then((resp) => (
         (resp.status !== 200)
-          ? reject(new Error(`GET / responded with ${resp.status}`))
+          ? reject(new Error(`GET / lalala ${resp.status}`))
           : resolve()
       ))
       .catch(() => waitForServerToBeReady(retries - 1).then(resolve, reject));

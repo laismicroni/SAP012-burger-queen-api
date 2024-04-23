@@ -1,54 +1,103 @@
+const mongoose = require('mongoose');
 const Product = require('../models/product');
 
-const productController = {
-  getAllProducts: async (req, res, next) => {
-    try {
-      const products = await Product.find();
-      res.json(products);
-    } catch (error) {
-      next(error);
-    }
-  },
-  
-  getProductById: async (req, res, next) => {
-    try {
-      const productId = req.params.productId;
-      const product = await Product.findById(productId);
-      res.json(product);
-    } catch (error) {
-      next(error);
-    }
-  },
-  
-  createProduct: async (req, res, next) => {
-    try {
-      const newProduct = new Product(req.body);
-      const savedProduct = await newProduct.save();
-      res.status(201).json(savedProduct);
-    } catch (error) {
-      next(error);
-    }
-  },
-  
-  updateProduct: async (req, res, next) => {
-    try {
-      const productId = req.params.productId;
-      const updatedProduct = await Product.findByIdAndUpdate(productId, req.body, { new: true });
-      res.json(updatedProduct);
-    } catch (error) {
-      next(error);
-    }
-  },
-  
-  deleteProduct: async (req, res, next) => {
-    try {
-      const productId = req.params.productId;
-      await Product.findByIdAndDelete(productId);
-      res.sendStatus(204);
-    } catch (error) {
-      next(error);
-    }
-  },
+const findProductById = async (productId) => {
+  if (mongoose.Types.ObjectId.isValid(productId)) {
+    return Product.findById(productId);
+  }
+  return null;
 };
 
-module.exports = productController;
+const getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.status(200).json(products);
+  } catch (error) {
+    console.error('Erro ao buscar produtos:', error);
+    res.status(500).json({ error: 'Erro ao buscar produtos' });
+  }
+};
+
+const createProduct = async (req, res) => {
+  try {
+    const {
+      name, price, type, image,
+    } = req.body;
+
+    if (!name || typeof price !== 'number' || !type || !image) {
+      return res.status(400).json({ error: 'Os campos nome, preço, tipo e imagem são obrigatórios' });
+    }
+
+    const newProduct = new Product({
+      name, price, type, image,
+    });
+    const savedProduct = await newProduct.save();
+
+    res.status(201).json(savedProduct);
+  } catch (error) {
+    console.error('Erro ao criar produto:', error);
+    res.status(500).json({ error: 'Erro ao criar produto' });
+  }
+};
+
+const updateProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const updateData = req.body;
+
+    const product = await findProductById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    Object.assign(product, updateData);
+
+    const updatedProduct = await product.save();
+
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    console.error('Erro ao atualizar produto:', error);
+    res.status(500).json({ error: 'Erro ao atualizar produto' });
+  }
+};
+
+const getProductById = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await findProductById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    res.status(200).json(product);
+  } catch (error) {
+    console.error('Erro ao buscar produto:', error);
+    res.status(500).json({ error: 'Erro ao buscar produto' });
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await findProductById(productId);
+
+    if (!product) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    await Product.findByIdAndDelete(productId);
+
+    res.status(200).json({ message: 'Produto deletado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao deletar produto:', error);
+    res.status(500).json({ error: 'Erro ao deletar produto' });
+  }
+};
+
+module.exports = {
+  getAllProducts, createProduct, updateProduct, getProductById, deleteProduct,
+};

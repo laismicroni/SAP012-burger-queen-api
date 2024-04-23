@@ -7,20 +7,32 @@ const httpErrors = {
 };
 
 const isKnownHTTPErrorStatus = (num) => (
-  typeof num === 'number' && Object.keys(httpErrors).indexOf(`${num}`) >= 0
+  typeof num === 'number' && Object.keys(httpErrors).includes(`${num}`)
 );
 
-// eslint-disable-next-line no-unused-vars
 module.exports = (err, req, resp, next) => {
-  const statusCode = (isKnownHTTPErrorStatus(err))
-    ? err
-    : err.statusCode || 500;
-  const message = err.message || httpErrors[statusCode] || err;
+  // Calcula o código de status
+  let statusCode = err.status || err.statusCode || 500;
 
-  if (statusCode === 500) {
-    console.error(statusCode, message);
+  // Verifica se o código de status é um código conhecido
+  if (!isKnownHTTPErrorStatus(statusCode)) {
+    statusCode = 500;
   }
 
-  resp.status(statusCode).json({ statusCode, message });
+  // Obtém a mensagem associada ao código de status
+  const message = err.message || httpErrors[statusCode];
+
+  // Loga os detalhes do erro para erro 500
+  if (statusCode === 500) {
+    console.error('Erro interno do servidor:', err);
+  }
+
+  // Responde com um JSON contendo o código de status e a mensagem
+  resp.status(statusCode).json({
+    statusCode,
+    message,
+  });
+
+  // Chama o próximo middleware (geralmente não é necessário, pois esse é o último middleware)
   next();
 };
