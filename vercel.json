@@ -2,10 +2,7 @@
     "version": "2",
     "builds": [
       {
-        "command": "docker build -t vercel .",
-        "env": {
-          "NODE_ENV": "production"
-        }
+        "command": "docker build -t vercel ."
       }
     ],
     "routes": [
