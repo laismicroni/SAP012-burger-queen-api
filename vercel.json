@@ -1,14 +1,15 @@
 {
-    "version": "2",
+    "version": 2,
     "builds": [
-      {
-        "command": "docker build -t vercel ."
-      }
+        {
+            "src": "index.js",
+            "use": "@Vercel Beta/node"
+        }
     ],
     "routes": [
-      {
-        "src": "/",
-        "dest": "/api"
-      }
+        {
+            "src": "/(.*)",
+            "dest": "index.js"
+        }
     ]
-  }
+}
