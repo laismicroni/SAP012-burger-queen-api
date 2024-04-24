@@ -60,3 +60,5 @@ initAdminUser().then(() => {
 }).catch((error) => {
   console.error('Erro ao verificar e criar usuário administrador:', error);
 });
+
+ module.exports = app;
