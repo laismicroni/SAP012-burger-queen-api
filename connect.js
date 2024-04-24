@@ -4,16 +4,24 @@ const config = require('./config');
 async function connectToDatabase() {
   try {
     console.log('Conectando ao banco de dados...');
-    const db = await mongoose.connect(config.dbUrl, { dbName: 'burguer-queen-db' });
 
-    // Verifique se o banco de dados precisa ser criado
+    let dbUrl;
+
+    if (process.env.MONGO_URL) {
+      dbUrl = process.env.MONGO_URL; 
+    } else {
+      dbUrl = config.dbUrl;
+    }
+
+    const db = await mongoose.connect(dbUrl, { dbName: 'burguer-queen-db' });
+
     if (db.connection.readyState === 1) {
       console.log(`Conectado ao banco de dados ${db.connection.name}`);
     } else {
       console.log(`Banco de dados '${db.connection.name}' criado com sucesso.`);
     }
 
-    return db; // Retorne a instância de conexão do banco de dados
+    return db; 
   } catch (error) {
     console.error('Erro ao conectar-se ao banco de dados:', error);
     throw new Error('Não foi possível se conectar ao banco de dados.');
