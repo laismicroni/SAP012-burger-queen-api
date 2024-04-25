@@ -25,7 +25,7 @@ app.use(authMiddleware(secret));
 async function initAdminUser() {
   try {
     // Verificar se o usuário admin já existe no banco de dados
-    const existingAdminUser = await User.findOne({ email: adminEmail });
+    const existingAdminUser = await User.findOne({ email: adminEmail }).maxTimeMS(10000);
 
     // Se o usuário admin não existir, criá-lo e salvá-lo no banco de dados
     if (!existingAdminUser) {
