@@ -5,13 +5,15 @@ async function connectToDatabase() {
   try {
     console.log('Conectando ao banco de dados...');
 
-    let dbUrl;
+    // let dbUrl;
 
-    if (process.env.MONGO_URL) {
-      dbUrl = process.env.MONGO_URL; 
-    } else {
-      dbUrl = config.dbUrl;
-    }
+    // if (process.env.MONGO_URL) {
+    //   dbUrl = process.env.MONGO_URL; 
+    // } else {
+    //   dbUrl = config.dbUrl;
+    // }
+
+    dbUrl = config.dbUrl;
 
     const db = await mongoose.connect(dbUrl, { dbName: 'burguer-queen-db' });
 
