@@ -3,13 +3,7 @@ const authRoutes = require('./auth');
 const usersRoutes = require('./users');
 const productsRoutes = require('./products');
 const ordersRoutes = require('./orders');
-
-const root = (app, next) => {
-  const pkg = app.get('pkg');
-  app.get('/', (req, res) => res.json({ name: pkg.name, version: pkg.version }));
-  app.all('*', (req, resp, nextAll) => nextAll(404));
-  return next();
-};
+const router = express.Router();
 
 const registerRoutes = (router, routes, next) => {
   if (!routes.length) {
@@ -24,8 +18,10 @@ const registerRoutes = (router, routes, next) => {
 
 module.exports = (app, next) => {
   const router = express.Router();
+  const pkg = app.get('pkg');
+  router.get('/', (req, res) => res.json({ name: pkg.name, version: pkg.version }));
 
-  const routes = [authRoutes, usersRoutes, productsRoutes, ordersRoutes, root];
+  const routes = [authRoutes, usersRoutes, productsRoutes, ordersRoutes];
 
   registerRoutes(router, routes, next);
 
