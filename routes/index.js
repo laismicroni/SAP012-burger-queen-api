@@ -4,6 +4,13 @@ const usersRoutes = require('./users');
 const productsRoutes = require('./products');
 const ordersRoutes = require('./orders');
 
+const root = (app, next) => {
+  const pkg = app.get('pkg');
+  app.get('/', (req, res) => res.json({ name: pkg.name, version: pkg.version }));
+  app.all('*', (req, resp, nextAll) => nextAll(404));
+  return next();
+};
+
 const registerRoutes = (router, routes, next) => {
   if (!routes.length) {
     return next();
@@ -18,7 +25,7 @@ const registerRoutes = (router, routes, next) => {
 module.exports = (app, next) => {
   const router = express.Router();
 
-  const routes = [authRoutes, usersRoutes, productsRoutes, ordersRoutes];
+  const routes = [authRoutes, usersRoutes, productsRoutes, ordersRoutes, root];
 
   registerRoutes(router, routes, next);
 
