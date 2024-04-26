@@ -1,3 +1,4 @@
+// Importações necessárias
 const express = require('express');
 const bcrypt = require('bcrypt');
 const config = require('./config');
@@ -8,26 +9,26 @@ const pkg = require('./package.json');
 const User = require('./models/user');
 require('./connect');
 
-const {
-  port, secret, adminEmail, adminPassword,
-} = config;
+// Extração de variáveis de configuração
+const { port, secret, adminEmail, adminPassword } = config;
+
+// Inicialização do aplicativo Express
 const app = express();
 
+// Configurações do aplicativo
 app.set('config', config);
 app.set('pkg', pkg);
 
-// parse application/x-www-form-urlencoded
+// Middlewares
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(authMiddleware(secret));
 
-// Verificar e criar usuário administrador
+// Função assíncrona para verificar e criar o usuário administrador
 async function initAdminUser() {
   try {
-    // Verificar se o usuário admin já existe no banco de dados
-    const existingAdminUser = await User.findOne({ email: adminEmail }).maxTimeMS(10000);
+    const existingAdminUser = await User.findOne({ email: adminEmail });
 
-    // Se o usuário admin não existir, criá-lo e salvá-lo no banco de dados
     if (!existingAdminUser) {
       const hashedPassword = await bcrypt.hash(adminPassword, 10);
       const adminUser = new User({
@@ -39,16 +40,15 @@ async function initAdminUser() {
       console.log('Usuário administrador criado com sucesso!');
     }
   } catch (error) {
-    console.error('Erro ao inicializar o usuário administrador:', error.message);
-    process.exit(1); // Encerra o aplicativo em caso de erro
+    throw new Error(`Erro ao inicializar o usuário administrador: ${error.message}`);
   }
 }
 
+// Inicialização do usuário administrador e servidor
 initAdminUser().then(() => {
-  // Registrar rotas após a criação do usuário administrador
   routes(app, (err) => {
     if (err) {
-      throw err;
+      throw new Error(`Erro ao registrar rotas: ${err.message}`);
     }
 
     app.use(errorHandler);
@@ -58,7 +58,9 @@ initAdminUser().then(() => {
     });
   });
 }).catch((error) => {
-  console.error('Erro ao verificar e criar usuário administrador:', error);
+  console.error(error.message);
+  process.exit(1);
 });
 
- module.exports = app;
+// Exportação do aplicativo Express
+module.exports = app;
