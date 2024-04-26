@@ -1,4 +1,3 @@
-https://app.swaggerhub.com/apis-docs/ssinuco/BurgerQueenAPI/3.0.0
 # REST API para Gerenciamento de Restaurante  
   
 Esta é uma API REST desenvolvida para um restaurante com funcionalidades de cadastro de usuários, clientes, produtos e pedidos. Foi construída utilizando Node.js, MongoDB e Docker, com o framework Express.js. O principal objetivo deste projeto foi adquirir familiaridade com conceitos fundamentais de desenvolvimento web, tais como rotas, URLs, protocolo HTTP, JSON, autenticação JWT, conexão com banco de dados MongoDB, variáveis de ambiente e implantação.  
