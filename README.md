@@ -1,10 +1,10 @@
-# REST API para Gerenciamento de Restaurante  
+# 🍔 Burguer Queen REST API  
   
 Esta é uma API REST desenvolvida para um restaurante com funcionalidades de cadastro de usuários, clientes, produtos e pedidos. Foi construída utilizando Node.js, MongoDB e Docker, com o framework Express.js. O principal objetivo deste projeto foi adquirir familiaridade com conceitos fundamentais de desenvolvimento web, tais como rotas, URLs, protocolo HTTP, JSON, autenticação JWT, conexão com banco de dados MongoDB, variáveis de ambiente e implantação.  
   
 ## Tecnologias Utilizadas  
   
-![NodeJs](https://img.shields.io/badge/Hashnode-2962FF?style=for-the-badge&logo=hashnode&logoColor=white)  
+![NodeJs](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)  
 ![Express](https://img.shields.io/badge/Express%20js-000000?style=for-the-badge&logo=express&logoColor=white)  
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)  
 ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)  
