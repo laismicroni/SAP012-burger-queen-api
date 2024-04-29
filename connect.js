@@ -16,7 +16,7 @@ async function connectToDatabase() {
     const dbUrl = config.dbUrl;
     console.info(dbUrl);
 
-    const db = await mongoose.connect(dbUrl, { dbName: 'burguer-queen-db' });
+    const db = await mongoose.connect(dbUrl);
 
     if (db.connection.readyState === 1) {
       console.log(`Conectado ao banco de dados ${db.connection.name}`);
